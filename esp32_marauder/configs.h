@@ -56,6 +56,11 @@
     #define MARAUDER_PANCAKE
     #define MARAUDER_WS_C5_35_OVERRIDE
   #endif
+  // The UART-host option is valid only for the M5StickC Plus2 profile.
+  #if defined(MARAUDER_M5STICKCP2_UART_HOST) && !defined(MARAUDER_M5STICKCP2)
+    #error "MARAUDER_M5STICKCP2_UART_HOST requires MARAUDER_M5STICKCP2"
+  #endif
+
   //// END BOARD TARGETS
 
   // The official Arduino board package supplies this identifier for the XIAO
