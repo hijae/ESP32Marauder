@@ -333,14 +333,8 @@ void setup()
     esp_log_level_set("*", ESP_LOG_NONE);
   #endif
   
-  #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
-    // Temporary UART0 host routing: HAT GPIO25 = RX, GPIO26 = TX.
-    // Grove GPIO32/33 remain available to GPS on UART1.
-    // TODO: move the complete CLI and all protocol output to UART2.
-    Serial.begin(115200, SERIAL_8N1, 25, 26);
-  #else
-    Serial.begin(115200);
-  #endif
+  // UART0 remains on the USB programming/debugging pins.
+  Serial.begin(115200);
 
   #ifdef HAS_ACT_LED
     pinMode(ACT_LED_PIN, OUTPUT);
