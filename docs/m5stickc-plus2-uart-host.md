@@ -39,3 +39,12 @@ Separate display/UI dependencies from the M5StickC Plus2 board profile, compile 
 ## UART2 integration blocker
 
 `CommandLine.cpp` reads from `Serial` and prints protocol output through `Serial` extensively. Other subsystems also emit data through `Serial`. `GpsInterface.cpp` declares a global `HardwareSerial Serial2(GPS_SERIAL_INDEX)`, so the identifier `Serial2` is already occupied by the GPS implementation (configured for UART1 on M5StickC Plus2). A dedicated host UART2 must use a distinct object name and requires a reviewed routing abstraction for both input and all protocol output. Simply calling `Serial2.begin` would conflict with the GPS implementation.
+
+## Dedicated UART2 CLI (in progress)
+
+- `Serial` / UART0 is preserved for USB logging and programming.
+- `MarauderHostSerial` is `HardwareSerial(2)`, RX GPIO25 and TX GPIO26, 115200 8N1.
+- `CommandLine.cpp` routes its own command input and output to `MarauderHostSerial` under the opt-in flag.
+- GPS retains UART1 on Grove GPIO32/33.
+- **Not yet protocol-complete:** outputs from other modules still use `Serial` and will not reach the UART2 host. Review scan/wardrive output and CLI-dependent subsystems before claiming Flipper compatibility.
+- **Not compiled or hardware tested.**
