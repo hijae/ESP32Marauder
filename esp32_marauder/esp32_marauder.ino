@@ -333,8 +333,13 @@ void setup()
     esp_log_level_set("*", ESP_LOG_NONE);
   #endif
   
-  // UART0 remains on the USB programming/debugging pins.
-  Serial.begin(115200);
+  #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+    // Interim host mode: UART0 on GPIO25/26; USB runtime logging is unavailable.
+    // GPS remains on UART1 GPIO32/33. Dedicated UART2 needs output routing.
+    Serial.begin(115200, SERIAL_8N1, 25, 26);
+  #else
+    Serial.begin(115200);
+  #endif
 
   #ifdef HAS_ACT_LED
     pinMode(ACT_LED_PIN, OUTPUT);
