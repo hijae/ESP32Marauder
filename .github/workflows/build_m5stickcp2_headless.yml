@@ -199,10 +199,47 @@ jobs:
             done
           fi
           
-      - name: Verify headless board flags
+      - name: Enable M5StickC Plus2 headless profile
         run: |
-          grep -q '^  //#define MARAUDER_M5STICKCP2' esp32_marauder/configs.h
-          grep -q 'MARAUDER_M5STICKCP2_UART_HOST' esp32_marauder/configs.h
+          python3 - <<'PY'
+          from pathlib import Path
+          config = Path("esp32_marauder/configs.h")
+          data = config.read_text()
+          for name in ("MARAUDER_M5STICKCP2", "MARAUDER_M5STICKCP2_UART_HOST"):
+              original = "  //#define " + name + "\n"
+              enabled = "  #define " + name + "\n"
+              if data.count(original) != 1:
+                  raise SystemExit(f"Expected one commented board flag: {name}")
+              data = data.replace(original, enabled, 1)
+          config.write_text(data)
+          PY
+          grep -E '^  #define MARAUDER_M5STICKCP2(_UART_HOST)?
+
+      - name: Build headless M5StickC Plus2
+        uses: ArminJo/arduino-test-compile@v3.3.0
+        with:
+          sketch-names: esp32_marauder.ino
+          arduino-board-fqbn: esp32:esp32:m5stick-c:PartitionScheme=min_spiffs
+          extra-arduino-cli-args: "--warnings none"
+          arduino-platform: esp32:esp32@2.0.11
+          platform-url: https://github.com/espressif/arduino-esp32/releases/download/2.0.11/package_esp32_dev_index.json
+
+
+      - name: Collect flashable firmware binaries
+        run: |
+          mkdir -p artifacts
+          find esp32_marauder/build -type f \( -name '*.bin' -o -name '*.elf' \) -print
+          find esp32_marauder/build -type f -name '*.bin' -exec cp -v {} artifacts/ \;
+          test -f artifacts/esp32_marauder.ino.bin
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5stickcp2-headless-gps-uart2
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14
+ esp32_marauder/configs.h
 
       - name: Build headless M5StickC Plus2
         uses: ArminJo/arduino-test-compile@v3.3.0
