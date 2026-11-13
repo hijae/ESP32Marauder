@@ -226,6 +226,18 @@
       #define HAS_GPS
     #endif
     #define HAS_DIRECT_UPLOAD
+
+    // Opt-in UART host: no display, buttons, battery telemetry or
+    // Grove GPS. Keep power hold and Wi-Fi/CLI initialization active.
+    #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+      #undef HAS_SCREEN
+      #undef HAS_MINI_SCREEN
+      #undef HAS_BUTTONS
+      #undef HAS_BATTERY
+      #undef HAS_PWR_MGMT
+      #undef HAS_CSI_BUTTON_CONTROLS
+      #undef HAS_TEMP_SENSOR
+    #endif
   #endif
 
   #if defined(MARAUDER_M5STACK_CORE2_AWS)
