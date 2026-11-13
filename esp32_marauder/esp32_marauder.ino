@@ -333,7 +333,13 @@ void setup()
     esp_log_level_set("*", ESP_LOG_NONE);
   #endif
   
-  Serial.begin(115200);
+  #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+    // Grove/HY2.0-4P: GPIO33 = RX, GPIO32 = TX.
+    // Route Marauder's CLI to the external UART host.
+    Serial.begin(115200, SERIAL_8N1, 33, 32);
+  #else
+    Serial.begin(115200);
+  #endif
 
   #ifdef HAS_ACT_LED
     pinMode(ACT_LED_PIN, OUTPUT);
