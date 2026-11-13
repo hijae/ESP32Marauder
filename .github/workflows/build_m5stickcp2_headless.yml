@@ -1,0 +1,230 @@
+name: Build M5StickC Plus2 Headless
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'esp32_marauder/**'
+      - '.github/workflows/build_m5stickcp2_headless.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: M5StickC Plus2 GPS + Kiisu UART2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          
+      - name: Install Arduino CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
+          echo "/home/runner/work/ESP32Marauder/ESP32Marauder/bin" >> $GITHUB_PATH
+          export PATH=$PATH:/home/runner/work/ESP32Marauder/ESP32Marauder/bin
+          arduino-cli version
+
+      #- name: Install Arduino-ESP32 Core v2.0.11
+      #  run: |
+      #    arduino-cli core update-index
+      #    arduino-cli core install esp32:esp32@2.0.11
+
+      - name: Verify Installed Cores
+        run: arduino-cli core list
+
+      - name: Build TestFile with ESP32 v2.0.11
+        uses: ArminJo/arduino-test-compile@v3.2.1
+        with:
+          sketch-names: TestFile.ino
+          arduino-board-fqbn: esp32:esp32:esp32s2
+          arduino-platform: esp32:esp32@2.0.11
+          platform-url: https://github.com/espressif/arduino-esp32/releases/download/2.0.11/package_esp32_dev_index.json
+
+      - name: Verify Installed Cores Again
+        run: arduino-cli core list
+          
+      - name: Show Arduino dir structure
+        run: |
+          find /home/runner/.arduino15/packages/esp32/hardware/
+          
+      - name: Install ESP32Ping
+        uses: actions/checkout@v2
+        with:
+          repository: marian-craciunescu/ESP32Ping
+          ref: 1.6
+          path: CustomESP32Ping
+          
+      - name: Install AsyncTCP
+        uses: actions/checkout@v2
+        with:
+          repository: ESP32Async/AsyncTCP
+          ref: v3.4.8
+          path: CustomAsyncTCP
+          
+      - name: Install MicroNMEA
+        uses: actions/checkout@v2
+        with:
+          repository: stevemarple/MicroNMEA
+          ref: v2.0.6
+          path: CustomMicroNMEA
+          
+      - name: Install ESPAsyncWebServer
+        uses: actions/checkout@v2
+        with:
+          repository: ESP32Async/ESPAsyncWebServer
+          ref: v3.8.1
+          path: CustomESPAsyncWebServer
+      
+      #- name: Install ESPAsyncWebServer
+      #  run: |
+      #    cp -r libraries/ESPAsyncWebServer ./CustomESPAsyncWebServer
+          
+      - name: Install TFT_eSPI
+        uses: actions/checkout@v2
+        with:
+          repository: Bodmer/TFT_eSPI
+          ref: V2.5.34
+          path: CustomTFT_eSPI
+
+      - name: Install XPT2046_Touchscreen
+        uses: actions/checkout@v2
+        with:
+          repository: PaulStoffregen/XPT2046_Touchscreen
+          ref: v1.4
+          path: CustomXPT2046_Touchscreen
+
+      - name: Install lv_arduino
+        uses: actions/checkout@v2
+        with:
+          repository: lvgl/lv_arduino
+          ref: 3.0.0
+          path: Customlv_arduino
+
+      - name: Install JPEGDecoder
+        uses: actions/checkout@v2
+        with:
+          repository: Bodmer/JPEGDecoder
+          ref: 1.8.0
+          path: CustomJPEGDecoder
+
+      - name: Install NimBLE-Arduino
+        uses: actions/checkout@v2
+        with:
+          repository: h2zero/NimBLE-Arduino
+          ref: 1.3.8
+          path: CustomNimBLE-Arduino
+
+      - name: Install Adafruit_NeoPixel
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_NeoPixel
+          ref: 1.12.0
+          path: CustomAdafruit_NeoPixel
+
+      - name: Install ArduinoJson
+        uses: actions/checkout@v2
+        with:
+          repository: bblanchon/ArduinoJson
+          ref: v6.18.2
+          path: CustomArduinoJson
+          
+      - name: Install LinkedList
+        uses: actions/checkout@v2
+        with:
+          repository: ivanseidel/LinkedList
+          ref: v1.3.3
+          path: CustomLinkedList
+          
+      - name: Install EspSoftwareSerial
+        uses: actions/checkout@v2
+        with:
+          repository: plerup/espsoftwareserial
+          ref: 8.1.0
+          path: CustomEspSoftwareSerial
+          
+      - name: Install Adafruit_BusIO
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_BusIO
+          ref: 1.15.0
+          path: CustomAdafruit_BusIO
+          
+      - name: Install Adafruit_MAX1704X
+        uses: actions/checkout@v2
+        with:
+          repository: adafruit/Adafruit_MAX1704X
+          ref: 1.0.2
+          path: CustomAdafruit_MAX1704X
+
+      - name: Install Adafruit_TCA8418
+        run: cp -r libraries/Adafruit_TCA8418 CustomAdafruit_TCA8418
+
+      - name: Show Libraries
+        run: |
+          find /home/runner/ -name "Custom*"
+          
+      - name: Configure TFT_eSPI
+        run: |
+          cp User*.h CustomTFT_eSPI/
+
+      - name: Install Esptool
+        run: |
+          pip install esptool
+
+      - name: Modify platform.txt
+        run: |
+          if [[ 2.0.11 == "2.0.11" ]]; then
+            for i in $(find /home/runner/.arduino15/packages/esp32/hardware/esp32/ -name "platform.txt"); do
+              sed -i 's/compiler.c.elf.libs.esp32c3=/compiler.c.elf.libs.esp32c3=-zmuldefs /' "$i"
+              sed -i 's/compiler.c.elf.libs.esp32s3=/compiler.c.elf.libs.esp32s3=-zmuldefs /' "$i"
+              sed -i 's/compiler.c.elf.libs.esp32s2=/compiler.c.elf.libs.esp32s2=-zmuldefs /' "$i"
+              sed -i 's/compiler.c.elf.libs.esp32=/compiler.c.elf.libs.esp32=-zmuldefs /' "$i"
+              sed -i 's/-fexceptions/-fno-exceptions/g' "$i"
+              cat "$i" | grep compiler.c.elf.libs.esp32c3
+              cat "$i" | grep compiler.c.elf.libs.esp32s3
+              cat "$i" | grep compiler.c.elf.libs.esp32s2
+              cat "$i" | grep compiler.c.elf.libs.esp32
+            done
+          fi
+          
+          if [[ 2.0.11 == "3.3.4" ]]; then
+            for i in $(find /home/runner/.arduino15/packages/esp32/hardware/esp32/ -name "platform.txt"); do
+              sed -i 's/compiler.c.elf.extra_flags=/compiler.c.elf.extra_flags=-Wl,-zmuldefs /' "$i"
+            done
+            for f in $(find /home/runner/.arduino15/packages/esp32/tools/esp32-arduino-libs/ -name "cpp_flags"); do
+              sed -i 's/-fexceptions/-fno-exceptions/g' "$f"
+            done
+          fi
+          
+      - name: Verify headless board flags
+        run: |
+          grep -q '^  //#define MARAUDER_M5STICKCP2' esp32_marauder/configs.h
+          grep -q 'MARAUDER_M5STICKCP2_UART_HOST' esp32_marauder/configs.h
+
+      - name: Build headless M5StickC Plus2
+        uses: ArminJo/arduino-test-compile@v3.3.0
+        with:
+          sketch-names: esp32_marauder.ino
+          arduino-board-fqbn: esp32:esp32:m5stick-c:PartitionScheme=min_spiffs
+          extra-arduino-cli-args: "--warnings none --build-property compiler.cpp.extra_flags='-DMARAUDER_M5STICKCP2 -DMARAUDER_M5STICKCP2_UART_HOST'"
+          arduino-platform: esp32:esp32@2.0.11
+          platform-url: https://github.com/espressif/arduino-esp32/releases/download/2.0.11/package_esp32_dev_index.json
+
+
+      - name: Collect flashable firmware binaries
+        run: |
+          mkdir -p artifacts
+          find esp32_marauder/build -type f \( -name '*.bin' -o -name '*.elf' \) -print
+          find esp32_marauder/build -type f -name '*.bin' -exec cp -v {} artifacts/ \;
+          test -f artifacts/esp32_marauder.ino.bin
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5stickcp2-headless-gps-uart2
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14
