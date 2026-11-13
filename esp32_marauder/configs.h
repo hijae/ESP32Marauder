@@ -15,6 +15,9 @@
   //// BOARD TARGETS
   //#define MARAUDER_M5STICKC
   //#define MARAUDER_M5STICKCP2
+  // Optional M5StickC Plus2 UART-host build (GPIO33 RX / GPIO32 TX).
+  // Enable with MARAUDER_M5STICKCP2; not compatible with Grove GPS.
+  //#define MARAUDER_M5STICKCP2_UART_HOST
   //#define MARAUDER_M5STACK_CORE2_AWS
   //#define MARAUDER_MINI
   //#define MARAUDER_V4
@@ -219,7 +222,9 @@
     #define HAS_SD
     #define USE_SD
     #define HAS_TEMP_SENSOR
-    #define HAS_GPS
+    #if !defined(MARAUDER_M5STICKCP2_UART_HOST)
+      #define HAS_GPS
+    #endif
     #define HAS_DIRECT_UPLOAD
   #endif
 
