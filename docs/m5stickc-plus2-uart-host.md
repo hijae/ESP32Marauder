@@ -6,7 +6,7 @@ This branch aims to support an M5StickC Plus2 (ESP32-PICO-V3-02) as a UART-conne
 
 - [x] Optional 115200 baud UART0 remap to the Grove/HY2.0-4P pins
 - [x] Disable the default GPS feature when UART-host mode is selected (GPIO32/33 conflict)
-- [ ] Remove display and button dependencies for a truly headless build
+- [x] Add compile-time gates for display, buttons, battery telemetry and temperature features (compile validation pending)
 - [ ] Compile and test the target firmware
 - [ ] Validate UART command/response behavior with the Flipper WiFi Marauder app
 - [ ] Validate external 5V power and boot behavior on real hardware
@@ -30,7 +30,7 @@ UART wiring:
 
 Power separately for the first test. Do not feed the host's 5 V into the M5StickC Plus2 Grove 5 V output. Use a verified 5 V input path when integrating power.
 
-**Important:** The initial UART remap uses `Serial` (UART0), which also changes runtime serial logging behavior. This is not yet a headless or tested build. Existing screen initialization and battery code remain in place.
+**Important:** The initial UART remap uses `Serial` (UART0), which also changes runtime serial logging behavior. This is not yet a headless or tested build. The UART-host build disables screen, buttons and battery telemetry at compile time. This has not yet been compiled or hardware-tested.
 
 ## Next steps
 
