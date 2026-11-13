@@ -334,9 +334,10 @@ void setup()
   #endif
   
   #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
-    // Grove/HY2.0-4P: GPIO33 = RX, GPIO32 = TX.
-    // Route Marauder's CLI to the external UART host.
-    Serial.begin(115200, SERIAL_8N1, 33, 32);
+    // Temporary UART0 host routing: HAT GPIO25 = RX, GPIO26 = TX.
+    // Grove GPIO32/33 remain available to GPS on UART1.
+    // TODO: move the complete CLI and all protocol output to UART2.
+    Serial.begin(115200, SERIAL_8N1, 25, 26);
   #else
     Serial.begin(115200);
   #endif
