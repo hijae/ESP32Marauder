@@ -3166,7 +3166,7 @@
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 9
       #define GPS_RX 21
-    #elif defined(MARAUDER_M5STICKC)
+    #elif defined(MARAUDER_M5STICKC) || defined(MARAUDER_M5STICKCP2)
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 33
       #define GPS_RX 32
