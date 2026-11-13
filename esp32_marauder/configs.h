@@ -2879,7 +2879,7 @@
       #define SD_CS 5
     #endif
 
-    #ifdef MARAUDER_M5STICKC
+    #if defined(MARAUDER_M5STICKC) || defined(MARAUDER_M5STICKCP2)
       #define SD_CS -1
     #endif
 
