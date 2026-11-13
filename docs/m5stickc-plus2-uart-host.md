@@ -48,3 +48,9 @@ Separate display/UI dependencies from the M5StickC Plus2 board profile, compile 
 - GPS retains UART1 on Grove GPIO32/33.
 - **Not yet protocol-complete:** outputs from other modules still use `Serial` and will not reach the UART2 host. Review scan/wardrive output and CLI-dependent subsystems before claiming Flipper compatibility.
 - **Not compiled or hardware tested.**
+
+## Protocol-output routing milestone
+
+`MarauderHostOutput.h` provides a conditional per-translation-unit `Serial` alias for the opt-in M5StickC Plus2 UART-host build. The alias is included **after** dependencies in `CommandLine.cpp`, `WiFiScan.cpp`, and `Buffer.cpp`, so their CLI, scan, and buffered output target `MarauderHostSerial` (UART2) while ordinary firmware initialization retains the USB `Serial` (UART0). GPS continues using its existing UART1 object.
+
+This is an incremental routing strategy, not a completed audit: other source files may still print data or binary streams to USB UART0, and cross-module code paths need verification. Compile, pin-level validation, host-app interoperability, and USB log separation have **not** been tested. Do not flash or merge as a validated release.
