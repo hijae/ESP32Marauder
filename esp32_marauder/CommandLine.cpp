@@ -1,11 +1,6 @@
 #include "CommandLine.h"
 
-// Route the command interpreter to the dedicated host UART in headless mode.
-// Other modules still use USB Serial; their output needs a follow-up audit.
-#if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
-  extern HardwareSerial MarauderHostSerial;
-  #define Serial MarauderHostSerial
-#endif
+#include "MarauderHostOutput.h"
 
 // GCOVR_EXCL_START -- serial protocol output depends on Arduino Serial.
 namespace {
