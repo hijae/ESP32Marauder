@@ -15,6 +15,7 @@
 #include "CensorText.h"
 #include "lang_var.h"
 #include <esp_ota_ops.h>
+#include "MarauderHostOutput.h"
 
 #ifdef HAS_PSRAM
   struct mac_addr* mac_history = nullptr;
