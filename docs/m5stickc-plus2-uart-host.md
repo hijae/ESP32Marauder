@@ -54,3 +54,7 @@ Separate display/UI dependencies from the M5StickC Plus2 board profile, compile 
 `MarauderHostOutput.h` provides a conditional per-translation-unit `Serial` alias for the opt-in M5StickC Plus2 UART-host build. The alias is included **after** dependencies in `CommandLine.cpp`, `WiFiScan.cpp`, and `Buffer.cpp`, so their CLI, scan, and buffered output target `MarauderHostSerial` (UART2) while ordinary firmware initialization retains the USB `Serial` (UART0). GPS continues using its existing UART1 object.
 
 This is an incremental routing strategy, not a completed audit: other source files may still print data or binary streams to USB UART0, and cross-module code paths need verification. Compile, pin-level validation, host-app interoperability, and USB log separation have **not** been tested. Do not flash or merge as a validated release.
+
+## CI firmware build
+
+The dedicated workflow `.github/workflows/build_m5stickcp2_headless.yml` is based on the existing Arduino build matrix and builds the M5StickC Plus2 target with both `MARAUDER_M5STICKCP2` and `MARAUDER_M5STICKCP2_UART_HOST` set via compiler flags. It uploads generated `.bin` files as the `m5stickcp2-headless-gps-uart2` artifact, retaining it for 14 days. The workflow can be run from Actions after GitHub recognizes the workflow, or via PR-triggered runs. No firmware artifact should be treated as verified until the job succeeds and device testing is performed.
