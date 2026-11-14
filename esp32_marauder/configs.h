@@ -796,14 +796,14 @@
   //// END BOARD FEATURES
 
   //// POWER MANAGEMENT
+  // StickC Plus2 needs GPIO4 held high even when UI power management is disabled.
+  #ifdef MARAUDER_M5STICKCP2
+    #define POWER_HOLD_PIN 4
+  #endif
+
   #ifdef HAS_PWR_MGMT
     #if defined(HAS_AXP192)
       #include "AXP192.h"
-    #endif
-
-    #ifdef MARAUDER_M5STICKCP2 
-        // Prevent StickCP2 from turning off when disconnect USB cable
-        #define POWER_HOLD_PIN 4
     #endif
   #endif
   //// END POWER MANAGEMENT
