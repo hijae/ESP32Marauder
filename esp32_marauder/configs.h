@@ -15,6 +15,9 @@
   //// BOARD TARGETS
   //#define MARAUDER_M5STICKC
   //#define MARAUDER_M5STICKCP2
+  // Optional M5StickC Plus2 UART-host build (Kiisu GPIO25 RX / GPIO26 TX).
+  // Enable with MARAUDER_M5STICKCP2; Grove GPS stays on GPIO32/33.
+  //#define MARAUDER_M5STICKCP2_UART_HOST
   //#define MARAUDER_M5STACK_CORE2_AWS
   //#define MARAUDER_MINI
   //#define MARAUDER_V4
@@ -53,6 +56,11 @@
     #define MARAUDER_PANCAKE
     #define MARAUDER_WS_C5_35_OVERRIDE
   #endif
+  // The UART-host option is valid only for the M5StickC Plus2 profile.
+  #if defined(MARAUDER_M5STICKCP2_UART_HOST) && !defined(MARAUDER_M5STICKCP2)
+    #error "MARAUDER_M5STICKCP2_UART_HOST requires MARAUDER_M5STICKCP2"
+  #endif
+
   //// END BOARD TARGETS
 
   // The official Arduino board package supplies this identifier for the XIAO
@@ -221,6 +229,18 @@
     #define HAS_TEMP_SENSOR
     #define HAS_GPS
     #define HAS_DIRECT_UPLOAD
+
+    // Opt-in UART host: no display, buttons, battery telemetry or
+    // Grove GPS. Keep power hold and Wi-Fi/CLI initialization active.
+    #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+      #undef HAS_SCREEN
+      #undef HAS_MINI_SCREEN
+      #undef HAS_BUTTONS
+      #undef HAS_BATTERY
+      #undef HAS_PWR_MGMT
+      #undef HAS_CSI_BUTTON_CONTROLS
+      #undef HAS_TEMP_SENSOR
+    #endif
   #endif
 
   #if defined(MARAUDER_M5STACK_CORE2_AWS)
@@ -776,14 +796,14 @@
   //// END BOARD FEATURES
 
   //// POWER MANAGEMENT
+  // StickC Plus2 needs GPIO4 held high even when UI power management is disabled.
+  #ifdef MARAUDER_M5STICKCP2
+    #define POWER_HOLD_PIN 4
+  #endif
+
   #ifdef HAS_PWR_MGMT
     #if defined(HAS_AXP192)
       #include "AXP192.h"
-    #endif
-
-    #ifdef MARAUDER_M5STICKCP2 
-        // Prevent StickCP2 from turning off when disconnect USB cable
-        #define POWER_HOLD_PIN 4
     #endif
   #endif
   //// END POWER MANAGEMENT
@@ -2859,7 +2879,7 @@
       #define SD_CS 5
     #endif
 
-    #ifdef MARAUDER_M5STICKC
+    #if defined(MARAUDER_M5STICKC) || defined(MARAUDER_M5STICKCP2)
       #define SD_CS -1
     #endif
 
@@ -3146,7 +3166,7 @@
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 9
       #define GPS_RX 21
-    #elif defined(MARAUDER_M5STICKC)
+    #elif defined(MARAUDER_M5STICKC) || defined(MARAUDER_M5STICKCP2)
       #define GPS_SERIAL_INDEX 1
       #define GPS_TX 33
       #define GPS_RX 32

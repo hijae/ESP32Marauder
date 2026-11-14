@@ -138,6 +138,9 @@ WiFiScan wifi_scan_obj;
 EvilPortal evil_portal_obj;
 Buffer buffer_obj;
 Settings settings_obj;
+#if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+  HardwareSerial MarauderHostSerial(2);
+#endif
 CommandLine cli_obj;
 ReconMission recon_obj;
 #if defined(HAS_CSI_MOTION)
@@ -334,6 +337,10 @@ void setup()
   #endif
   
   Serial.begin(115200);
+  #if defined(MARAUDER_M5STICKCP2) && defined(MARAUDER_M5STICKCP2_UART_HOST)
+    // UART2: HAT GPIO25 RX / GPIO26 TX; GPS stays on UART1.
+    MarauderHostSerial.begin(115200, SERIAL_8N1, 25, 26);
+  #endif
 
   #ifdef HAS_ACT_LED
     pinMode(ACT_LED_PIN, OUTPUT);

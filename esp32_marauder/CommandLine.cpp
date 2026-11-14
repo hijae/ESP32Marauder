@@ -1,5 +1,7 @@
 #include "CommandLine.h"
 
+#include "MarauderHostOutput.h"
+
 // GCOVR_EXCL_START -- serial protocol output depends on Arduino Serial.
 namespace {
   bool parseFiniteNumber(const String& value, double& parsed) {

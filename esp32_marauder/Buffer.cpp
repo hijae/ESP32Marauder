@@ -1,6 +1,7 @@
 #include "Buffer.h"
 #include "PcapHeader.h"
 #include "lang_var.h"
+#include "MarauderHostOutput.h"
 
 Buffer::Buffer(){
   bufA = (uint8_t*)malloc(BUF_SIZE);
